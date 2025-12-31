@@ -12,11 +12,18 @@ const useFetch = (cb) => {
 
     try {
       const response = await cb(...args);
+      
+      // Check if response indicates an error
+      if (response && response.success === false) {
+        const errorObj = new Error(response.error || "An error occurred");
+        setError(errorObj);
+        return;
+      }
+      
       setData(response);
       setError(null);
     } catch (error) {
       setError(error);
-      toast.error(error.message);
     } finally {
       setLoading(false);
     }
