@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
-import { ArrowLeft, CarFront, Heart, Layout } from "lucide-react";
+import { ArrowLeft, CarFront, Heart, Layout, GitCompare } from "lucide-react";
 import { checkUser } from "@/lib/checkUser";
 
 const Header = async ({ isAdminPage = false }) => {
@@ -41,6 +41,12 @@ const Header = async ({ isAdminPage = false }) => {
             </Link>
           ) : (
             <SignedIn>
+              <Link href="/compare">
+                <Button variant="outline">
+                  <GitCompare size={18} />
+                  <span className="hidden md:inline">Compare</span>
+                </Button>
+              </Link>
               <Link href="/saved-cars">
                 <Button>
                   <Heart size={18} />

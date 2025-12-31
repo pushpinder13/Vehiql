@@ -124,12 +124,16 @@ function CarDetails({ car, testDriveInfo }) {
                 fill
                 className="object-cover"
                 priority
+                unoptimized
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
               />
-            ) : (
-              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                <Car className="h-24 w-24 text-gray-400" />
-              </div>
-            )}
+            ) : null}
+            <div className={`w-full h-full bg-gray-200 flex items-center justify-center ${car.images && car.images.length > 0 ? 'hidden' : ''}`}>
+              <Car className="h-24 w-24 text-gray-400" />
+            </div>
           </div>
 
           {car.images && car.images.length > 1 && (
@@ -151,7 +155,15 @@ function CarDetails({ car, testDriveInfo }) {
                     }`}
                     fill
                     className="object-cover"
+                    unoptimized
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
                   />
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center hidden">
+                    <Car className="h-6 w-6 text-gray-400" />
+                  </div>
                 </div>
               ))}
             </div>

@@ -4,6 +4,7 @@ import { deleteCar, getCars, updateCarStatus } from "@/actions/cars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -41,18 +42,17 @@ import {
   Star,
   StarOff,
   Trash2,
-  Edit,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+
 const CarsList = () => {
   const [search, setSearch] = useState("");
-  const router = useRouter();
 
+  const router = useRouter();  
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [carToDelete, setCarToDelete] = useState(null);
 
@@ -214,16 +214,13 @@ const CarsList = () => {
                               height={40}
                               width={40}
                               className="w-full h-full object-cover"
-                              unoptimized
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
-                              }}
+                              priority
                             />
-                          ) : null}
-                          <div className={`w-full h-full bg-gray-200 flex items-center justify-center ${car.images && car.images.length > 0 ? 'hidden' : ''}`}>
-                            <CarIcon className="h-6 w-6 text-gray-400" />
-                          </div>
+                          ) : (
+                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                              <CarIcon className="h-6 w-6 text-gray-400" />
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell className="font-medium">
                           {car.make} {car.model}
@@ -266,12 +263,6 @@ const CarsList = () => {
                               >
                                 <Eye className="mr-2 h-4 w-4" />
                                 View
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => router.push(`/admin/cars/edit/${car.id}`)}
-                              >
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem>Status</DropdownMenuItem>

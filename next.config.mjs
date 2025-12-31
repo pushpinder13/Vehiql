@@ -4,7 +4,6 @@ const nextConfig = {
     serverComponentsHmrCache: false,
   },
   images:{
-    unoptimized: true,
     remotePatterns:[
       {
         protocol:"https",

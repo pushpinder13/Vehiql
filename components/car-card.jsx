@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Heart, Car as CarIcon, Loader2 } from "lucide-react";
+import { Heart, Car as CarIcon, Loader2, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,11 +11,13 @@ import { toggleSavedCar } from "@/actions/car-listing";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
+import { useComparison } from "@/contexts/comparison-context";
 
 export const CarCard = ({ car }) => {
   const { isSignedIn } = useAuth();
   const router = useRouter();
   const [isSaved, setIsSaved] = useState(car.wishlisted);
+  const { addToComparison, isInComparison } = useComparison();
 
   const {
     loading: isToggling,
@@ -51,6 +53,12 @@ export const CarCard = ({ car }) => {
     await toggleSavedCarFn(car.id);
   };
 
+  const handleAddToComparison = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToComparison(car);
+  };
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition group">
       <div className="relative h-48">
@@ -61,7 +69,15 @@ export const CarCard = ({ car }) => {
               alt={`${car.make} ${car.model}`}
               fill
               className="object-cover group-hover:scale-105 transition duration-300"
+              unoptimized
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
             />
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center hidden">
+              <CarIcon className="h-12 w-12 text-gray-400" />
+            </div>
           </div>
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -69,23 +85,38 @@ export const CarCard = ({ car }) => {
           </div>
         )}
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5 ${
-            isSaved
-              ? "text-red-500 hover:text-red-600"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-          onClick={handleToggleSave}
-          disabled={isToggling}
-        >
-          {isToggling ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Heart className={isSaved ? "fill-current" : ""} size={20} />
-          )}
-        </Button>
+        <div className="absolute top-2 right-2 flex gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`bg-white/90 rounded-full p-1.5 ${
+              isInComparison(car.id)
+                ? "text-blue-500 hover:text-blue-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+            onClick={handleAddToComparison}
+            disabled={isInComparison(car.id)}
+          >
+            <GitCompare size={20} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`bg-white/90 rounded-full p-1.5 ${
+              isSaved
+                ? "text-red-500 hover:text-red-600"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+            onClick={handleToggleSave}
+            disabled={isToggling}
+          >
+            {isToggling ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Heart className={isSaved ? "fill-current" : ""} size={20} />
+            )}
+          </Button>
+        </div>
       </div>
 
       <CardContent className="p-4">
