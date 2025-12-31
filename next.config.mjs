@@ -4,11 +4,8 @@ const nextConfig = {
     serverComponentsHmrCache: false,
   },
   images:{
+    unoptimized: true,
     remotePatterns:[
-      {
-        protocol:"https",
-        hostname: "pkayjdkerjplfqgqlzmr.supabase.co",
-      },
       {
         protocol:"https",
         hostname: "lpuibowzqcchtdfjlapa.supabase.co",

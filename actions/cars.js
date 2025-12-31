@@ -303,6 +303,52 @@ export async function deleteCar(id) {
   }
 }
 
+export async function updateCar(carId, carData) {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user || user.role !== "ADMIN") throw new Error("Unauthorized");
+
+    const car = await db.car.update({
+      where: { id: carId },
+      data: {
+        make: carData.make,
+        model: carData.model,
+        year: carData.year,
+        price: carData.price,
+        mileage: carData.mileage,
+        color: carData.color,
+        fuelType: carData.fuelType,
+        transmission: carData.transmission,
+        bodyType: carData.bodyType,
+        seats: carData.seats,
+        description: carData.description,
+        status: carData.status,
+        featured: carData.featured,
+      },
+    });
+
+    revalidatePath("/admin/cars");
+    revalidatePath(`/cars/${carId}`);
+
+    return {
+      success: true,
+      data: car,
+    };
+  } catch (error) {
+    console.error("Error updating car:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to update car",
+    };
+  }
+}
+
 export async function updateCarStatus(id, { status, featured }) {
   try {
     const { userId } = await auth();
