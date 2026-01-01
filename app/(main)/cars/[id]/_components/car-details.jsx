@@ -33,6 +33,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import EmiCalculator from "./emi-calculator";
+import ReviewSection from "./review-section";
 
 function CarDetails({ car, testDriveInfo }) {
   const router = useRouter();
@@ -473,6 +474,8 @@ function CarDetails({ car, testDriveInfo }) {
           </div>
         </div>
       </div>
+
+      <ReviewSection carId={car.id} />
     </div>
   );
 }

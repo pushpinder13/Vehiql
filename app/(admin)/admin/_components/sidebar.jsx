@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Car, Calendar, Cog, LogOut } from "lucide-react";
+import { LayoutDashboard, Car, Calendar, Cog, LogOut, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SignOutButton } from "@clerk/nextjs";
 
@@ -21,6 +21,11 @@ const routes = [
     label: "Test Drives",
     icon: Calendar,
     href: "/admin/test-drives",
+  },
+  {
+    label: "Reviews",
+    icon: Star,
+    href: "/admin/reviews",
   },
   {
     label: "Settings",

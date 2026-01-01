@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
-import { ArrowLeft, CarFront, Heart, Layout, GitCompare } from "lucide-react";
+import { ArrowLeft, CarFront, Heart, Layout, GitCompare, ShoppingBag } from "lucide-react";
 import { checkUser } from "@/lib/checkUser";
 
 const Header = async ({ isAdminPage = false }) => {
@@ -45,6 +45,12 @@ const Header = async ({ isAdminPage = false }) => {
                 <Button variant="outline">
                   <GitCompare size={18} />
                   <span className="hidden md:inline">Compare</span>
+                </Button>
+              </Link>
+              <Link href="/purchase-history">
+                <Button variant="outline">
+                  <ShoppingBag size={18} />
+                  <span className="hidden md:inline">My Purchases</span>
                 </Button>
               </Link>
               <Link href="/saved-cars">

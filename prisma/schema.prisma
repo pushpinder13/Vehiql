@@ -20,6 +20,9 @@ model User {
   role          UserRole           @default(USER)
   savedCars     UserSavedCar[]
   testDrives    TestDriveBooking[]
+  reviews       Review[]
+  reviewVotes   ReviewVote[]
+  purchases     Purchase[]
 }
 
 enum UserRole {
@@ -45,6 +48,8 @@ model Car {
   images            String[]           // Array of Supabase storage URLs
   savedBy           UserSavedCar[]
   testDriveBookings TestDriveBooking[]
+  reviews           Review[]
+  purchases         Purchase[]
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
@@ -142,4 +147,68 @@ enum BookingStatus {
   COMPLETED
   CANCELLED
   NO_SHOW
+}
+
+model Review {
+  id          String       @id @default(uuid())
+  carId       String
+  car         Car          @relation(fields: [carId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int          // 1-5 stars
+  title       String
+  comment     String
+  status      ReviewStatus @default(PENDING)
+  helpfulVotes Int         @default(0)
+  unhelpfulVotes Int       @default(0)
+  votes       ReviewVote[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([userId, carId]) // One review per user per car
+  @@index([carId])
+  @@index([userId])
+  @@index([status])
+  @@index([rating])
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ReviewVote {
+  id       String   @id @default(uuid())
+  reviewId String
+  review   Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isHelpful Boolean // true for helpful, false for unhelpful
+  createdAt DateTime @default(now())
+
+  @@unique([userId, reviewId]) // One vote per user per review
+  @@index([reviewId])
+  @@index([userId])
+}
+
+model Purchase {
+  id           String        @id @default(uuid())
+  carId        String
+  car          Car           @relation(fields: [carId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchaseDate DateTime      @default(now())
+  status       PurchaseStatus @default(COMPLETED)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([carId])
+  @@index([userId])
+  @@index([purchaseDate])
+}
+
+enum PurchaseStatus {
+  COMPLETED
+  REFUNDED
 }

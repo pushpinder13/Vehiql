@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -55,19 +56,31 @@ export default function PurchaseForm({ car }) {
     
     // Simulate payment processing
     setTimeout(async () => {
-      // Complete the purchase (update car status to SOLD)
-      const result = await completePurchaseFn(car.id);
-      
-      setIsProcessing(false);
-      
-      if (result?.success) {
-        setPaymentComplete(true);
-        toast.success("Payment successful! Car marked as sold.");
-      } else {
-        toast.error(result?.error || "Purchase failed");
+      try {
+        // Complete the purchase (update car status to SOLD)
+        await completePurchaseFn(car.id);
+        setIsProcessing(false);
+      } catch (error) {
+        console.error("Purchase error:", error);
+        setIsProcessing(false);
+        toast.error("Purchase failed. Please try again.");
       }
     }, 3000);
   };
+
+  // Handle purchase result from useFetch
+  React.useEffect(() => {
+    if (purchaseResult?.success) {
+      setPaymentComplete(true);
+      toast.success("Payment successful! Car marked as sold.");
+    }
+  }, [purchaseResult]);
+
+  React.useEffect(() => {
+    if (purchaseError) {
+      toast.error(purchaseError.message || "Purchase failed");
+    }
+  }, [purchaseError]);
 
   if (paymentComplete) {
     return (
@@ -108,7 +121,15 @@ export default function PurchaseForm({ car }) {
                   alt={`${car.year} ${car.make} ${car.model}`}
                   fill
                   className="object-cover"
+                  unoptimized
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
                 />
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center hidden">
+                  <Car className="h-12 w-12 text-gray-400" />
+                </div>
               </div>
             )}
             
