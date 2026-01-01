@@ -42,6 +42,7 @@ import {
   Star,
   StarOff,
   Trash2,
+  Edit,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -263,6 +264,12 @@ const CarsList = () => {
                               >
                                 <Eye className="mr-2 h-4 w-4" />
                                 View
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => router.push(`/admin/cars/edit/${car.id}`)}
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem>Status</DropdownMenuItem>
