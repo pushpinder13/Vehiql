@@ -303,7 +303,7 @@ export async function deleteCar(id) {
   }
 }
 
-export async function updateCar(carId, carData) {
+export async function updateCar(carId, carData, newImages = [], imagesToDelete = []) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
@@ -313,6 +313,83 @@ export async function updateCar(carId, carData) {
     });
 
     if (!user || user.role !== "ADMIN") throw new Error("Unauthorized");
+
+    // Get current car data
+    const currentCar = await db.car.findUnique({
+      where: { id: carId },
+      select: { images: true },
+    });
+
+    if (!currentCar) throw new Error("Car not found");
+
+    let updatedImages = currentCar.images.filter(img => !imagesToDelete.includes(img));
+
+    // Upload new images if any
+    if (newImages.length > 0) {
+      const cookieStore = await cookies();
+      const supabase = createClient(cookieStore);
+      const folderPath = `cars/${carId}`;
+
+      for (let i = 0; i < newImages.length; i++) {
+        const base64Data = newImages[i];
+
+        if (!base64Data || !base64Data.startsWith("data:image/")) {
+          console.warn("Skipping invalid image data");
+          continue;
+        }
+
+        const base64 = base64Data.split(",")[1];
+        const imageBuffer = Buffer.from(base64, "base64");
+
+        const mimeMatch = base64Data.match(/data:image\/([a-zA-Z0-9]+);/);
+        const fileExtension = mimeMatch ? mimeMatch[1] : "jpeg";
+
+        const fileName = `image-${Date.now()}-${i}.${fileExtension}`;
+        const filePath = `${folderPath}/${fileName}`;
+
+        const { data, error } = await supabase.storage
+          .from("car-images")
+          .upload(filePath, imageBuffer, {
+            contentType: `image/${fileExtension}`,
+          });
+
+        if (error) {
+          console.error("Error uploading image:", error);
+          continue;
+        }
+
+        const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${filePath}`;
+        updatedImages.push(publicUrl);
+      }
+    }
+
+    // Delete old images from storage
+    if (imagesToDelete.length > 0) {
+      try {
+        const cookieStore = await cookies();
+        const supabase = createClient(cookieStore);
+
+        const filePaths = imagesToDelete
+          .map((imageUrl) => {
+            const url = new URL(imageUrl);
+            const pathMatch = url.pathname.match(/\/car-images\/(.*)/);
+            return pathMatch ? pathMatch[1] : null;
+          })
+          .filter(Boolean);
+
+        if (filePaths.length > 0) {
+          const { error } = await supabase.storage
+            .from("car-images")
+            .remove(filePaths);
+
+          if (error) {
+            console.error("Error deleting images:", error);
+          }
+        }
+      } catch (storageError) {
+        console.error("Error with storage operations:", storageError);
+      }
+    }
 
     const car = await db.car.update({
       where: { id: carId },
@@ -330,6 +407,7 @@ export async function updateCar(carId, carData) {
         description: carData.description,
         status: carData.status,
         featured: carData.featured,
+        images: updatedImages,
       },
     });
 

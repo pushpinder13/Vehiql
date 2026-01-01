@@ -12,11 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Upload, X, Car as CarIcon } from "lucide-react";
 import { updateCar } from "@/actions/cars";
 import { useRouter } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import Link from "next/link";
+import Image from "next/image";
 
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"];
 const transmissions = ["Automatic", "Manual", "Semi-Automatic"];
@@ -44,6 +45,10 @@ const editCarSchema = z.object({
 
 export default function EditCarForm({ car }) {
   const router = useRouter();
+  const [images, setImages] = useState([]);
+  const [existingImages, setExistingImages] = useState(car.images || []);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const {
     register,
@@ -100,7 +105,62 @@ export default function EditCarForm({ car }) {
       seats: data.seats ? parseInt(data.seats) : null,
     };
 
-    await updateCarFn(car.id, carData);
+    await updateCarFn(car.id, carData, images, imagesToDelete);
+  };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    processFiles(files);
+  };
+
+  const processFiles = (files) => {
+    files.forEach((file) => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImages(prev => [...prev, e.target.result]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      processFiles(files);
+    }
+  };
+
+  const removeNewImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (imageUrl) => {
+    setExistingImages(prev => prev.filter(img => img !== imageUrl));
+    setImagesToDelete(prev => [...prev, imageUrl]);
   };
 
   return (
@@ -293,6 +353,108 @@ export default function EditCarForm({ car }) {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              <Label>Car Images</Label>
+              
+              {/* All Images in One Grid */}
+              {(existingImages.length > 0 || images.length > 0) && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {/* Existing Images */}
+                  {existingImages.map((imageUrl, index) => (
+                    <div key={`existing-${index}`} className="relative group">
+                      <div className="aspect-square rounded-lg overflow-hidden border">
+                        <Image
+                          src={imageUrl}
+                          alt={`Car image ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center hidden">
+                          <CarIcon className="h-8 w-8 text-gray-400" />
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removeExistingImage(imageUrl)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  {/* New Images */}
+                  {images.map((image, index) => (
+                    <div key={`new-${index}`} className="relative group">
+                      <div className="aspect-square rounded-lg overflow-hidden border border-blue-200">
+                        <Image
+                          src={image}
+                          alt={`New image ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="absolute top-1 left-1">
+                        <span className="bg-blue-500 text-white text-xs px-1 py-0.5 rounded">NEW</span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removeNewImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <div 
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  isDragOver 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <div className="flex flex-col items-center">
+                    <Upload className={`h-8 w-8 mb-2 ${
+                      isDragOver ? 'text-blue-500' : 'text-gray-400'
+                    }`} />
+                    <p className={`text-sm mb-1 ${
+                      isDragOver ? 'text-blue-600' : 'text-gray-600'
+                    }`}>
+                      {isDragOver ? 'Drop images here' : 'Click to upload or drag & drop images'}
+                    </p>
+                    <p className="text-xs text-gray-500">PNG, JPG up to 10MB each</p>
+                  </div>
+                </label>
               </div>
             </div>
 
