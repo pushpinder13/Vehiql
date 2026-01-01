@@ -262,7 +262,7 @@ function CarDetails({ car, testDriveInfo }) {
                 Our representatives are available to answer all your queries
                 about this vehicle.
               </p>
-              <a href="mailto:help@vehiql.in">
+              <a href="mailto:pdhaliwalp3@gmail.com">
                 <Button variant="outline" className="w-full">
                   Request Info
                 </Button>
