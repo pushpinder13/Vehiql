@@ -382,3 +382,91 @@ export async function updateCarStatus(id, { status, featured }) {
     };
   }
 }
+
+export async function getSoldCars() {
+  try {
+    const cars = await db.car.findMany({
+      where: {
+        status: "SOLD",
+      },
+      include: {
+        reviews: {
+          where: {
+            status: "APPROVED",
+          },
+          include: {
+            user: {
+              select: {
+                name: true,
+                imageUrl: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+        },
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    const carsWithRatings = cars.map(car => {
+      const averageRating = car.reviews.length > 0 
+        ? car.reviews.reduce((sum, review) => sum + review.rating, 0) / car.reviews.length 
+        : 0;
+      
+      return {
+        id: car.id,
+        make: car.make,
+        model: car.model,
+        year: car.year,
+        price: parseFloat(car.price),
+        mileage: car.mileage,
+        color: car.color,
+        fuelType: car.fuelType,
+        transmission: car.transmission,
+        bodyType: car.bodyType,
+        seats: car.seats,
+        description: car.description,
+        status: car.status,
+        featured: car.featured,
+        images: car.images,
+        createdAt: car.createdAt,
+        updatedAt: car.updatedAt,
+        reviews: car.reviews,
+        averageRating: Math.round(averageRating * 10) / 10,
+      };
+    });
+
+    return carsWithRatings;
+  } catch (error) {
+    console.error("Error fetching sold cars:", error);
+    return [];
+  }
+}
+
+export async function getSoldCarById(id) {
+  try {
+    const car = await db.car.findUnique({
+      where: {
+        id,
+        status: "SOLD",
+      },
+    });
+
+    if (car) {
+      return {
+        ...car,
+        price: parseFloat(car.price),
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching sold car:", error);
+    return null;
+  }
+}

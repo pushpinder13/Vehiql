@@ -47,6 +47,12 @@ const Header = async ({ isAdminPage = false }) => {
                   <span className="hidden md:inline">Compare</span>
                 </Button>
               </Link>
+              <Link href="/sold-cars">
+                <Button variant="outline">
+                  <CarFront size={18} />
+                  <span className="hidden md:inline">Sold Cars</span>
+                </Button>
+              </Link>
               <Link href="/purchase-history">
                 <Button variant="outline">
                   <ShoppingBag size={18} />
