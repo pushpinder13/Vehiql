@@ -7,6 +7,8 @@ export const metadata = {
   description: "Browse and search for your dream car",
 };
 
+export const revalidate = 180; // Cache for 3 minutes
+
 export default async function CarsPage() {
   const filtersData = await getCarFilters();
 

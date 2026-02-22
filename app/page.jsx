@@ -14,6 +14,8 @@ import { Calendar, Car, ChevronRight, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+export const revalidate = 300; // Cache homepage for 5 minutes
+
 export default async function Home() {
 const featuredCars = await getFeaturedCars();
 

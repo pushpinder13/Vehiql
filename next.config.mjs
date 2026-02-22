@@ -2,6 +2,7 @@
 const nextConfig = {
   experimental: {
     serverComponentsHmrCache: false,
+    optimizePackageImports: ['lucide-react', '@clerk/nextjs'],
   },
   images:{
     unoptimized: true,
@@ -10,8 +11,12 @@ const nextConfig = {
         protocol:"https",
         hostname: "lpuibowzqcchtdfjlapa.supabase.co",
       }
-    ]
+    ],
+    formats: ['image/webp'],
   },
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
 };
 
 

@@ -6,6 +6,8 @@ export const metadata = {
   description: "Browse previously sold cars and their customer reviews",
 };
 
+export const revalidate = 300; // Cache for 5 minutes
+
 export default async function SoldCarsPage() {
   const soldCars = await getSoldCars();
 
