@@ -599,24 +599,24 @@ try {
 ### Environment Variables Breakdown
 ```env
 # Database Configuration
-DATABASE_URL="postgresql://postgres.lpuibowzqcchtdfjlapa:Pushpinder%2310@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
-DIRECT_URL="postgresql://postgres.lpuibowzqcchtdfjlapa:Pushpinder%2310@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
+DATABASE_URL="<your-database-url>"
+DIRECT_URL="<your-direct-database-url>"
 
 # Authentication (Clerk)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_dmFzdC1sYXJrLTIxLmNsZXJrLmFjY291bnRzLmRldiQ
-CLERK_SECRET_KEY=sk_test_IMAxYmpRygY2VNiC3KqfUzYWMDFPDg2rFMEBpvdhFq
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your-clerk-publishable-key>
+CLERK_SECRET_KEY=<your-clerk-secret-key>
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
 # File Storage (Supabase)
-NEXT_PUBLIC_SUPABASE_URL=https://lpuibowzqcchtdfjlapa.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdWlib3d6cWNjaHRkZmpsYXBhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNzg4MTksImV4cCI6MjA4MjY1NDgxOX0.F7hghh32DR5j1nsLG6lMRSaZ-mUccYqI1aGE1AOXqpE
+NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 
 # AI Integration
-GEMINI_API_KEY=AIzaSyCNbAMd2GTjeL4wRBMYFCB6whA-jNRO8tM
+GEMINI_API_KEY=<your-gemini-api-key>
 
 # Security
-ARCJET_KEY=ajkey_01kdqb5wgafabryhy8j462xhy2
+ARCJET_KEY=<your-arcjet-key>
 ```
 
 ### Next.js Configuration Details
